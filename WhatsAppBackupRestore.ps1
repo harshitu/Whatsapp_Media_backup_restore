@@ -5,22 +5,23 @@ $ScriptLocation = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # Generate a timestamp for the backup folder
 $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$BackupPath = "$ScriptLocation\WhatsApp_Backup_$Timestamp\"  # Default backup location with timestamp
+$DefaultBackupPath = "$ScriptLocation\WhatsApp_Backup_$Timestamp\"  # Default backup location with timestamp
 
 $WhatsAppLocalCachePath = "C:\Users\Harshit\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalCache"
 $WhatsAppTransfersPath = "C:\Users\Harshit\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState\shared\transfers"
 
 # Check if a folder was provided by dragging and dropping
 if ($args.Count -gt 0) {
-    $BackupPath = $args[0] + "_$Timestamp\"
+    $DefaultBackupPath = $args[0] + "_$Timestamp\"
 }
 
 # Function to Back Up WhatsApp Data
 function Backup-WhatsApp {
+    $BackupPath = $DefaultBackupPath
     if (-not (Test-Path -Path $BackupPath)) {
         New-Item -ItemType Directory -Path $BackupPath
     }
-    
+
     # Backup LocalCache
     if (Test-Path -Path $WhatsAppLocalCachePath) {
         $LocalCacheBackupPath = "$BackupPath\LocalCache"
@@ -31,7 +32,7 @@ function Backup-WhatsApp {
     } else {
         Write-Host "LocalCache directory not found. Skipping backup for LocalCache."
     }
-    
+
     # Backup Transfers
     if (Test-Path -Path $WhatsAppTransfersPath) {
         $TransfersBackupPath = "$BackupPath\Transfers"
@@ -48,14 +49,32 @@ function Backup-WhatsApp {
 
 # Function to Restore WhatsApp Data
 function Restore-WhatsApp {
-    if (-not (Test-Path -Path $BackupPath)) {
-        Write-Host "Backup folder not found. Please back up your WhatsApp data first."
+    # Let the user select the backup folder
+    $BackupRootPath = "$ScriptLocation\WhatsApp_Backup_*"
+    $BackupFolders = Get-ChildItem -Path $BackupRootPath -Directory
+
+    if ($BackupFolders.Count -eq 0) {
+        Write-Host "No backup folders found in $ScriptLocation."
         return
     }
 
+    Write-Host "Available Backups:"
+    for ($i = 0; $i -lt $BackupFolders.Count; $i++) {
+        Write-Host "$($i + 1). $($BackupFolders[$i].Name)"
+    }
+
+    $selectedIndex = Read-Host "Select the number of the backup you want to restore"
+
+    if (-not ($selectedIndex -as [int] -and $selectedIndex -gt 0 -and $selectedIndex -le $BackupFolders.Count)) {
+        Write-Host "Invalid selection. Please run the script again and select a valid backup."
+        return
+    }
+
+    $BackupPath = $BackupFolders[$selectedIndex - 1].FullName
+
     $WhatsAppLocalCachePath2 = "C:\Users\Harshit\Desktop\Whatsapp\LocalCache"
     $WhatsAppTransfersPath2 = "C:\Users\Harshit\Desktop\Whatsapp\LocalState\shared\transfers"
-    
+
     # Restore LocalCache
     $LocalCacheBackupPath = "$BackupPath\LocalCache"
     if (Test-Path -Path $LocalCacheBackupPath) {
@@ -63,7 +82,7 @@ function Restore-WhatsApp {
     } else {
         Write-Host "LocalCache backup folder not found."
     }
-    
+
     # Restore Transfers
     $TransfersBackupPath = "$BackupPath\Transfers"
     if (Test-Path -Path $TransfersBackupPath) {
