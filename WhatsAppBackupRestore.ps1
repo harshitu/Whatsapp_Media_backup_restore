@@ -8,8 +8,8 @@ $MainBackupDirectory = "$ScriptLocation\WhatsApp_Backups"
 $Timestamp = Get-Date -Format "yyyy.MM.dd_tt-HH.mm.ss"
 $DefaultBackupPath = "$MainBackupDirectory\Backup_$Timestamp\"
 
-$WhatsAppLocalCachePath = "C:\Users\Harshit\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalCache"
-$WhatsAppTransfersPath = "C:\Users\Harshit\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState\shared\transfers"
+$WhatsAppLocalCachePath = "$env:LOCALAPPDATA\Packages\*.WhatsAppDesktop_*\LocalCache"
+$WhatsAppTransfersPath = "$env:LOCALAPPDATA\Packages\*.WhatsAppDesktop_*\LocalState\shared\transfers"
 
 # Ensure the main backup directory exists
 if (-not (Test-Path -Path $MainBackupDirectory)) {
