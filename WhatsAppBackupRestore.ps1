@@ -2,19 +2,18 @@
 
 # Get the script or executable location
 $ScriptLocation = Split-Path -Parent $MyInvocation.MyCommand.Path
-$MainBackupDirectory = "$ScriptLocation\WhatsApp_Backups"
 
 # Generate a timestamp for the backup folder
 $Timestamp = Get-Date -Format "yyyy.MM.dd_tt-HH.mm.ss"
-$DefaultBackupPath = "$MainBackupDirectory\Backup_$Timestamp\"
+$BackupRootPath = "$ScriptLocation\WhatsApp_Backups\"  # Root backup location
+$DefaultBackupPath = "$BackupRootPath\Backup_$Timestamp\"  # Default backup location with timestamp
+$MergedBackupPath = "$BackupRootPath\Backup_All_Merged\"  # Merged backup location
 
-$WhatsAppLocalCachePath = "$env:LOCALAPPDATA\Packages\*.WhatsAppDesktop_*\LocalCache"
-$WhatsAppTransfersPath = "$env:LOCALAPPDATA\Packages\*.WhatsAppDesktop_*\LocalState\shared\transfers"
+# Locate the WhatsApp package directory using a specific pattern
+$WhatsAppBasePath = Get-ChildItem "$env:LOCALAPPDATA\Packages" | Where-Object { $_.Name -like "*.WhatsAppDesktop_*" } | Select-Object -ExpandProperty FullName
 
-# Ensure the main backup directory exists
-if (-not (Test-Path -Path $MainBackupDirectory)) {
-    New-Item -ItemType Directory -Path $MainBackupDirectory
-}
+$WhatsAppLocalCachePath = "$WhatsAppBasePath\LocalCache"
+$WhatsAppTransfersPath = "$WhatsAppBasePath\LocalState\shared\transfers"
 
 # Check if a folder was provided by dragging and dropping
 if ($args.Count -gt 0) {
@@ -23,65 +22,58 @@ if ($args.Count -gt 0) {
 
 # Function to Back Up WhatsApp Data
 function Backup-WhatsApp {
-    # Create separate backup folder
-    $BackupPath = $DefaultBackupPath
-    if (-not (Test-Path -Path $BackupPath)) {
-        New-Item -ItemType Directory -Path $BackupPath
+    if (-not (Test-Path -Path $DefaultBackupPath)) {
+        New-Item -ItemType Directory -Path $DefaultBackupPath
     }
 
-    # Create a merged backup folder
-    $MergedBackupPath = "$MainBackupDirectory\Backup_All_Merged"
     if (-not (Test-Path -Path $MergedBackupPath)) {
         New-Item -ItemType Directory -Path $MergedBackupPath
     }
 
     # Backup LocalCache
     if (Test-Path -Path $WhatsAppLocalCachePath) {
-        $LocalCacheBackupPath = "$BackupPath\LocalCache"
-        $MergedLocalCacheBackupPath = "$MergedBackupPath\LocalCache"
-
+        $LocalCacheBackupPath = "$DefaultBackupPath\LocalCache"
         if (-not (Test-Path -Path $LocalCacheBackupPath)) {
             New-Item -ItemType Directory -Path $LocalCacheBackupPath
         }
-        if (-not (Test-Path -Path $MergedLocalCacheBackupPath)) {
-            New-Item -ItemType Directory -Path $MergedLocalCacheBackupPath
-        }
-
         Copy-Item -Path "$WhatsAppLocalCachePath\*" -Destination $LocalCacheBackupPath -Recurse -Force
-        Copy-Item -Path "$WhatsAppLocalCachePath\*" -Destination $MergedLocalCacheBackupPath -Recurse -Force
+        Copy-Item -Path "$WhatsAppLocalCachePath\*" -Destination "$MergedBackupPath\LocalCache" -Recurse -Force
     } else {
         Write-Host "LocalCache directory not found. Skipping backup for LocalCache."
     }
 
     # Backup Transfers
     if (Test-Path -Path $WhatsAppTransfersPath) {
-        $TransfersBackupPath = "$BackupPath\LocalState\shared\transfers"
-        $MergedTransfersBackupPath = "$MergedBackupPath\LocalState\shared\transfers"
-
+        $TransfersBackupPath = "$DefaultBackupPath\LocalState\shared\transfers"
         if (-not (Test-Path -Path $TransfersBackupPath)) {
             New-Item -ItemType Directory -Path $TransfersBackupPath -Force
         }
-        if (-not (Test-Path -Path $MergedTransfersBackupPath)) {
-            New-Item -ItemType Directory -Path $MergedTransfersBackupPath -Force
+
+        # Ensure that directories are created before copying files
+        Get-ChildItem -Path $WhatsAppTransfersPath -Directory | ForEach-Object {
+            $SubDir = "$MergedBackupPath\LocalState\shared\transfers\$($_.Name)"
+            if (-not (Test-Path -Path $SubDir)) {
+                New-Item -ItemType Directory -Path $SubDir -Force
+            }
+            Copy-Item -Path "$($_.FullName)\*" -Destination $SubDir -Recurse -Force
         }
 
         Copy-Item -Path "$WhatsAppTransfersPath\*" -Destination $TransfersBackupPath -Recurse -Force
-        Copy-Item -Path "$WhatsAppTransfersPath\*" -Destination $MergedTransfersBackupPath -Recurse -Force
     } else {
         Write-Host "Transfers directory not found. Skipping backup for Transfers."
     }
 
-    Write-Host "WhatsApp data has been backed up to $BackupPath and merged in $MergedBackupPath."
+    Write-Host "WhatsApp data has been backed up to $DefaultBackupPath."
 }
 
 # Function to Restore WhatsApp Data
 function Restore-WhatsApp {
     # Let the user select the backup folder
-    $BackupRootPath = "$MainBackupDirectory\Backup_*"
+    $BackupRootPath = "$ScriptLocation\WhatsApp_Backups\Backup_*"
     $BackupFolders = Get-ChildItem -Path $BackupRootPath -Directory
 
     if ($BackupFolders.Count -eq 0) {
-        Write-Host "No backup folders found in $MainBackupDirectory."
+        Write-Host "No backup folders found in $BackupRootPath."
         return
     }
 
@@ -118,16 +110,9 @@ function Restore-WhatsApp {
     $TransfersBackupPath = "$BackupPath\LocalState\shared\transfers"
     if (Test-Path -Path $TransfersBackupPath) {
         if (-not (Test-Path -Path $WhatsAppTransfersPath)) {
-            New-Item -ItemType Directory -Path $WhatsAppTransfersPath
+            New-Item -ItemType Directory -Path $WhatsAppTransfersPath -Force
         }
-        # Ensure the subdirectories in Transfers exist before copying
-        Get-ChildItem -Path $TransfersBackupPath -Directory | ForEach-Object {
-            $SubDir = "$WhatsAppTransfersPath\$($_.Name)"
-            if (-not (Test-Path -Path $SubDir)) {
-                New-Item -ItemType Directory -Path $SubDir
-            }
-            Copy-Item -Path "$($_.FullName)\*" -Destination $SubDir -Recurse -Force
-        }
+        Copy-Item -Path "$TransfersBackupPath\*" -Destination $WhatsAppTransfersPath -Recurse -Force
     } else {
         Write-Host "Transfers backup folder not found."
     }
