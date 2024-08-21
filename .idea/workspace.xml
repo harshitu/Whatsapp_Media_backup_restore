@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1612fe1e-0a45-4bad-9848-6f34083df2fe" name="Changes" comment="solved: one more 'cannot be copied onto existing leaf item.' error.&#10;The Error:&#10;&quot;Copy-Item : Container cannot be copied onto existing leaf item.&#10; At C:\Users\Harshit\Desktop\WhatsAppBackupRestore.ps1:52 char:9&#10; +         Copy-Item -Path &quot;$WhatsAppTransfersPath\*&quot; -Destination &quot;$Mer ...&quot;&#10; if destination &quot;Whatsapp_Backups&quot; directory not exists. so Solved." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SET_USER_NAME_GLOBALLY" value="false" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2kvxyeFVfYhGFxKDW1FoJPFjxH3" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "jdk.selected.JAVA_MODULE": "11",
+    "last_opened_file_path": "C:/Users/Harshit/Desktop/Whatsapp_backup_powershell_script",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.smartKeys"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Harshit\Desktop\Whatsapp_backup_powershell_script" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1612fe1e-0a45-4bad-9848-6f34083df2fe" name="Changes" comment="" />
+      <created>1724178108191</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1724178108191</updated>
+      <workItem from="1724178110071" duration="27241000" />
+    </task>
+    <task id="LOCAL-00001" summary="initial commit">
+      <created>1724178321416</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1724178321416</updated>
+    </task>
+    <task id="LOCAL-00002" summary="changes: logic of selecting backup before restore.">
+      <created>1724181698683</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1724181698683</updated>
+    </task>
+    <task id="LOCAL-00003" summary="solved: Copy-Item : Container cannot be copied onto existing leaf item. (and some folder created as file)">
+      <created>1724228489932</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1724228489933</updated>
+    </task>
+    <task id="LOCAL-00004" summary="changes: multiple backup folders.&#10;logic of havign multiple backups with timestamp in root directory.&#10;and having incremental backup in one speacial &quot;Backup_All_Merged&quot; directory.">
+      <created>1724241489063</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1724241489063</updated>
+    </task>
+    <task id="LOCAL-00005" summary="changes: dyncamic selection of whatsapp folder by wildcards">
+      <created>1724252292105</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1724252292105</updated>
+    </task>
+    <task id="LOCAL-00006" summary="solved: one more 'cannot be copied onto existing leaf item.' error.&#10;The Error:&#10;&quot;Copy-Item : Container cannot be copied onto existing leaf item.&#10; At C:\Users\Harshit\Desktop\WhatsAppBackupRestore.ps1:52 char:9&#10; +         Copy-Item -Path &quot;$WhatsAppTransfersPath\*&quot; -Destination &quot;$Mer ...&quot;&#10; if destination &quot;Whatsapp_Backups&quot; directory not exists. so Solved.">
+      <created>1724264177909</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1724264177909</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit" />
+    <MESSAGE value="changes: logic of selecting backup before restore." />
+    <MESSAGE value="solved: Copy-Item : Container cannot be copied onto existing leaf item. (and some folder created as file)" />
+    <MESSAGE value="changes: multiple backup folders.&#10;logic of havign multiple backups with timestamp in root directory.&#10;and having incremental backup in one speacial &quot;Backup_All_Merged&quot; directory." />
+    <MESSAGE value="changes: dyncamic selection of whatsapp folder by wildcards" />
+    <MESSAGE value="solved: one more 'cannot be copied onto existing leaf item.' error.&#10;The Error:&#10;&quot;Copy-Item : Container cannot be copied onto existing leaf item.&#10; At C:\Users\Harshit\Desktop\WhatsAppBackupRestore.ps1:52 char:9&#10; +         Copy-Item -Path &quot;$WhatsAppTransfersPath\*&quot; -Destination &quot;$Mer ...&quot;&#10; if destination &quot;Whatsapp_Backups&quot; directory not exists. so Solved." />
+    <option name="LAST_COMMIT_MESSAGE" value="solved: one more 'cannot be copied onto existing leaf item.' error.&#10;The Error:&#10;&quot;Copy-Item : Container cannot be copied onto existing leaf item.&#10; At C:\Users\Harshit\Desktop\WhatsAppBackupRestore.ps1:52 char:9&#10; +         Copy-Item -Path &quot;$WhatsAppTransfersPath\*&quot; -Destination &quot;$Mer ...&quot;&#10; if destination &quot;Whatsapp_Backups&quot; directory not exists. so Solved." />
+  </component>
+</project>
