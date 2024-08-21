@@ -78,6 +78,9 @@ function Restore-WhatsApp {
     # Restore LocalCache
     $LocalCacheBackupPath = "$BackupPath\LocalCache"
     if (Test-Path -Path $LocalCacheBackupPath) {
+        if (-not (Test-Path -Path $WhatsAppLocalCachePath2)) {
+            New-Item -ItemType Directory -Path $WhatsAppLocalCachePath2
+        }
         Copy-Item -Path "$LocalCacheBackupPath\*" -Destination $WhatsAppLocalCachePath2 -Recurse -Force
     } else {
         Write-Host "LocalCache backup folder not found."
@@ -86,7 +89,17 @@ function Restore-WhatsApp {
     # Restore Transfers
     $TransfersBackupPath = "$BackupPath\Transfers"
     if (Test-Path -Path $TransfersBackupPath) {
-        Copy-Item -Path "$TransfersBackupPath\*" -Destination $WhatsAppTransfersPath2 -Recurse -Force
+        if (-not (Test-Path -Path $WhatsAppTransfersPath2)) {
+            New-Item -ItemType Directory -Path $WhatsAppTransfersPath2
+        }
+        # Ensure the subdirectories in Transfers exist before copying
+        Get-ChildItem -Path $TransfersBackupPath -Directory | ForEach-Object {
+            $SubDir = "$WhatsAppTransfersPath2\$($_.Name)"
+            if (-not (Test-Path -Path $SubDir)) {
+                New-Item -ItemType Directory -Path $SubDir
+            }
+            Copy-Item -Path "$($_.FullName)\*" -Destination $SubDir -Recurse -Force
+        }
     } else {
         Write-Host "Transfers backup folder not found."
     }
