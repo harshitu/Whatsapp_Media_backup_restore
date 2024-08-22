@@ -12,8 +12,8 @@ $MergedBackupPath = "$BackupRootPath\Backup_All_Merged\"  # Merged backup locati
 # Locate the WhatsApp package directory using a specific pattern
 $WhatsAppBasePath = Get-ChildItem "$env:LOCALAPPDATA\Packages" | Where-Object { $_.Name -like "*.WhatsAppDesktop_*" } | Select-Object -ExpandProperty FullName
 
-$WhatsAppLocalCachePath = "$WhatsAppBasePath\LocalCache"
-$WhatsAppTransfersPath = "$WhatsAppBasePath\LocalState\shared\transfers"
+$global:WhatsAppLocalCachePath = "$WhatsAppBasePath\LocalCache"
+$global:WhatsAppTransfersPath = "$WhatsAppBasePath\LocalState\shared\transfers"
 
 # Check if a folder was provided by dragging and dropping
 if ($args.Count -gt 0) {
@@ -31,26 +31,26 @@ function Backup-WhatsApp {
     }
 
     # Backup LocalCache
-    if (Test-Path -Path $WhatsAppLocalCachePath) {
+    if (Test-Path -Path $global:WhatsAppLocalCachePath) {
         $LocalCacheBackupPath = "$DefaultBackupPath\LocalCache"
         if (-not (Test-Path -Path $LocalCacheBackupPath)) {
             New-Item -ItemType Directory -Path $LocalCacheBackupPath
         }
-        Copy-Item -Path "$WhatsAppLocalCachePath\*" -Destination $LocalCacheBackupPath -Recurse -Force
-        Copy-Item -Path "$WhatsAppLocalCachePath\*" -Destination "$MergedBackupPath\LocalCache" -Recurse -Force
+        Copy-Item -Path "$global:WhatsAppLocalCachePath\*" -Destination $LocalCacheBackupPath -Recurse -Force
+        Copy-Item -Path "$global:WhatsAppLocalCachePath\*" -Destination "$MergedBackupPath\LocalCache" -Recurse -Force
     } else {
         Write-Host "LocalCache directory not found. Skipping backup for LocalCache."
     }
 
     # Backup Transfers
-    if (Test-Path -Path $WhatsAppTransfersPath) {
+    if (Test-Path -Path $global:WhatsAppTransfersPath) {
         $TransfersBackupPath = "$DefaultBackupPath\LocalState\shared\transfers"
         if (-not (Test-Path -Path $TransfersBackupPath)) {
             New-Item -ItemType Directory -Path $TransfersBackupPath -Force
         }
 
         # Ensure that directories are created before copying files
-        Get-ChildItem -Path $WhatsAppTransfersPath -Directory | ForEach-Object {
+        Get-ChildItem -Path $global:WhatsAppTransfersPath -Directory | ForEach-Object {
             $SubDir = "$MergedBackupPath\LocalState\shared\transfers\$($_.Name)"
             if (-not (Test-Path -Path $SubDir)) {
                 New-Item -ItemType Directory -Path $SubDir -Force
@@ -58,7 +58,7 @@ function Backup-WhatsApp {
             Copy-Item -Path "$($_.FullName)\*" -Destination $SubDir -Recurse -Force
         }
 
-        Copy-Item -Path "$WhatsAppTransfersPath\*" -Destination $TransfersBackupPath -Recurse -Force
+        Copy-Item -Path "$global:WhatsAppTransfersPath\*" -Destination $TransfersBackupPath -Recurse -Force
     } else {
         Write-Host "Transfers directory not found. Skipping backup for Transfers."
     }
@@ -91,17 +91,16 @@ function Restore-WhatsApp {
 
     $BackupPath = $BackupFolders[$selectedIndex - 1].FullName
 
-    #testing
-    $WhatsAppLocalCachePath = "C:\Users\Harshit\Desktop\Whatsapp\LocalCache"
-    $WhatsAppTransfersPath = "C:\Users\Harshit\Desktop\Whatsapp\LocalState\shared\transfers"
+    # Ask user for testing or real WhatsApp paths
+    AskWhereToRestore
 
     # Restore LocalCache
     $LocalCacheBackupPath = "$BackupPath\LocalCache"
     if (Test-Path -Path $LocalCacheBackupPath) {
-        if (-not (Test-Path -Path $WhatsAppLocalCachePath)) {
-            New-Item -ItemType Directory -Path $WhatsAppLocalCachePath
+        if (-not (Test-Path -Path $global:WhatsAppLocalCachePath)) {
+            New-Item -ItemType Directory -Path $global:WhatsAppLocalCachePath
         }
-        Copy-Item -Path "$LocalCacheBackupPath\*" -Destination $WhatsAppLocalCachePath -Recurse -Force
+        Copy-Item -Path "$LocalCacheBackupPath\*" -Destination $global:WhatsAppLocalCachePath -Recurse -Force
     } else {
         Write-Host "LocalCache backup folder not found."
     }
@@ -109,15 +108,36 @@ function Restore-WhatsApp {
     # Restore Transfers
     $TransfersBackupPath = "$BackupPath\LocalState\shared\transfers"
     if (Test-Path -Path $TransfersBackupPath) {
-        if (-not (Test-Path -Path $WhatsAppTransfersPath)) {
-            New-Item -ItemType Directory -Path $WhatsAppTransfersPath -Force
+        if (-not (Test-Path -Path $global:WhatsAppTransfersPath)) {
+            New-Item -ItemType Directory -Path $global:WhatsAppTransfersPath -Force
         }
-        Copy-Item -Path "$TransfersBackupPath\*" -Destination $WhatsAppTransfersPath -Recurse -Force
+        Copy-Item -Path "$TransfersBackupPath\*" -Destination $global:WhatsAppTransfersPath -Recurse -Force
     } else {
         Write-Host "Transfers backup folder not found."
     }
 
     Write-Host "WhatsApp data has been restored from $BackupPath."
+}
+
+function AskWhereToRestore {
+    Write-Host "Press T: to restore into testing directory"
+    Write-Host "Press W: to restore into real WhatsApp directory :"
+
+    do{
+        $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown").Character
+    } while (-not [char]::IsLetterOrDigit($key))
+
+    if ($key -eq 'T') {  # 'T' key
+        # Update paths for testing
+        $global:WhatsAppLocalCachePath = "$ScriptLocation\$env:USERNAME\AppData\Local\Packages\$(Get-ChildItem "$env:LOCALAPPDATA\Packages\" | Where-Object { $_.Name -like "*.WhatsAppDesktop_*" }).Name\LocalCache"
+        $global:WhatsAppTransfersPath = "$ScriptLocation\$env:USERNAME\AppData\Local\Packages\$(Get-ChildItem "$env:LOCALAPPDATA\Packages\" | Where-Object { $_.Name -like "*.WhatsAppDesktop_*" }).Name\LocalState\shared\transfers"
+    } elseif ($key -eq 'W') {  # 'W' key
+        # Use real WhatsApp paths (paths are already set)
+        Write-Host "Using real WhatsApp paths."
+    } else {
+        Write-Host "Invalid key pressed. Exiting."
+        exit
+    }
 }
 
 # Main Menu
