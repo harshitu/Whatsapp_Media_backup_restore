@@ -7,7 +7,7 @@ try {
     Get-Command -Module ps2exe
 
     # Run command
-    Invoke-ps2exe -inputFile "WhatsAppBackupRestore.ps1" -OutputFile "WhatsAppBackupRestore.exe"
+    Invoke-ps2exe -inputFile "$PSScriptRoot\WhatsAppBackupRestore.ps1" -OutputFile "$PSScriptRoot\WhatsAppBackupRestore.exe"
 
     # More info "Get-Help Invoke-ps2exe"
     #EXAMPLE: Invoke-ps2exe C:\Data\MyScript.ps1

@@ -1,7 +1,11 @@
 # WhatsApp Backup and Restore Script
 
 # Get the script or executable location
-$ScriptLocation = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ScriptLocation = if ($MyInvocation.MyCommand.Path) {
+    Split-Path -Parent $MyInvocation.MyCommand.Path
+} else {
+    Split-Path -Parent $([System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName)
+}
 
 # Generate a timestamp for the backup folder
 $Timestamp = Get-Date -Format "yyyy.MM.dd_tt-HH.mm.ss"
@@ -35,6 +39,9 @@ function Backup-WhatsApp {
         $LocalCacheBackupPath = "$DefaultBackupPath\LocalCache"
         if (-not (Test-Path -Path $LocalCacheBackupPath)) {
             New-Item -ItemType Directory -Path $LocalCacheBackupPath
+        }
+        if (-not (Test-Path -Path "$MergedBackupPath\LocalCache")) {
+            New-Item -ItemType Directory -Path "$MergedBackupPath\LocalCache"
         }
         Copy-Item -Path "$global:WhatsAppLocalCachePath\*" -Destination $LocalCacheBackupPath -Recurse -Force
         Copy-Item -Path "$global:WhatsAppLocalCachePath\*" -Destination "$MergedBackupPath\LocalCache" -Recurse -Force
